@@ -1,0 +1,47 @@
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: master
+spec:
+  containers:
+  - name: master
+    image: saikrishnaoduru/jmeter:latest
+    args: ["-n -t /mnt/jmeter/script.jmx -l /mnt/jmeter/results/result-2023-02-08_17-41-36.jtl -j /mnt/jmeter/logs/master-log-2023-02-08_17-41-36.log  -e -o /mnt/jmeter/HtmlReport-2023-02-08_17-41-36 -R slave1,slave2"]
+    env:
+    - name: JVM_ARGS
+      value: "-Xms512m -Xmx1024m"
+    - name: mode
+      value: "master"
+    resources:
+      limits:
+        memory: 1024Mi
+        cpu: 1000m
+      requests:
+        cpu: 1000m
+        memory: 1024Mi
+    volumeMounts:
+      - name: master
+        mountPath: /mnt/jmeter
+  volumes:
+    - name: master
+      hostPath:
+        path: /home/saikrishna/Downloads/jmeter/kubernetes-init/data/
+        type: DirectoryOrCreate
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: master
+spec:
+  selector:
+    app: master
+  ports:
+    - name: master
+      port: 1099
+  type: ClusterIP
+
+---
