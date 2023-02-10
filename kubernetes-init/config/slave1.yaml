@@ -19,7 +19,7 @@ spec:
       containers:
       - name: slave1
         image: saikrishnaoduru/jmeter:latest
-        args: ["-n -t /jmeter/First.jmx -l /jmeter/results/result-2023-02-08_17-41-36.jtl -j /jmeter/logs/slave1-log-2023-02-08_17-41-36.log -R SERVERS"]
+        args: ["-n -t First.jmx -l /results/result.jtl -j /logs/slave1-log.log -R SERVERS; while true; do sleep 80; done;"]
         env:
         - name: JVM_ARGS
           value: "-Xms512m -Xmx1024m"
