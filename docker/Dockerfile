@@ -1,3 +1,4 @@
+#docker build -t jmeter:test .
 FROM alpine
 RUN apk add --no-cache --upgrade bash
 
@@ -17,7 +18,7 @@ RUN    apk update \
 	&& apk upgrade \
 	&& apk add ca-certificates \
 	&& update-ca-certificates \
-            && apk add --update openjdk8-jre tzdata curl unzip bash \
+            && apk add --update openjdk11-jre tzdata curl unzip bash \
             && cp /usr/share/zoneinfo/${TIMEZONE} /etc/localtime \
             && echo ${TIMEZONE} >  /etc/timezone \
 	&& rm -rf /var/cache/apk/* \
@@ -31,15 +32,8 @@ RUN    apk update \
 
 ENV PATH $PATH:$JMETER_BIN
 
-COPY entrypoint.sh /entrypoint.sh
-COPY jmeter-plugin-install.sh /jmeter-plugin-install.sh
-COPY cleanup.sh /cleanup.sh
+COPY ./launch.sh /
+RUN chmod +x /launch.sh
 
-RUN chmod +x /entrypoint.sh \
-    && chmod +x /jmeter-plugin-install.sh \
-    && chmod +x /cleanup.sh \
-    && /jmeter-plugin-install.sh \
-    && /cleanup.sh
-
-ENTRYPOINT ["/entrypoint.sh"]
-CMD ["-n -t First.jmx -l /results/reslut-$(date +'%m_%d_%Y-%H_%M_%S_%N').jtl -j /logs/master-log-$(date +'%m_%d_%Y-%H_%M_%S_%N').log"]
+ENTRYPOINT ["/launch.sh"]
+CMD ["-n -t /jmeter/First.jmx -l /results/reslut-$(date +'%m_%d_%Y-%H_%M_%S_%N').jtl -j /logs/master-log-$(date +'%m_%d_%Y-%H_%M_%S_%N').log"]
