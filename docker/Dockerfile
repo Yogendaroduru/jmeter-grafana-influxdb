@@ -1,22 +1,35 @@
-FROM bellsoft/liberica-runtime-container:latest
+FROM alpine
+RUN apk add --no-cache --upgrade bash
 
-LABEL Author="NaveenKumar Namachivayam"
-LABEL Website="https://qainsights.com"
-LABEL Description="A Light-weight Apache JMeter Dockerfile based on Alpaquita"
+ARG JMETER_VERSION="5.5"
 
-ENV JMETER_VERSION="5.5"
-ENV JMETER_CMD_RUNNER_VERSION="2.2"
-ENV JMETER_PLUGIN_MANAGER_VERSION="1.8"
-ENV JMETER_HOME="/opt/apache/apache-jmeter-${JMETER_VERSION}"
+ENV JMETER_HOME /opt/apache-jmeter-${JMETER_VERSION}
+ENV JMETER_BIN  ${JMETER_HOME}/bin
+ENV MIRROR_HOST http://mirrors.ocf.berkeley.edu/apache/jmeter
+ENV JMETER_DOWNLOAD_URL ${MIRROR_HOST}/binaries/apache-jmeter-${JMETER_VERSION}.tgz
+ENV JMETER_PLUGINS_DOWNLOAD_URL https://repo1.maven.org/maven2/kg/apc
+ENV JMETER_PLUGINS_FOLDER ${JMETER_HOME}/lib/ext/
 
-RUN wget -q https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-${JMETER_VERSION}.tgz -O /tmp/apache-jmeter-${JMETER_VERSION}.tgz \
-    && mkdir -p /opt/apache \
-    && tar -zxvf /tmp/apache-jmeter-${JMETER_VERSION}.tgz -C /opt/apache \
-    && rm /tmp/apache-jmeter-${JMETER_VERSION}.tgz
-
-ENV JMETER_BIN="${JMETER_HOME}/bin"
-ENV PATH="$PATH:$JMETER_BIN"
+#Time Zone https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 ENV TIMEZONE Asia/Kolkata
+
+RUN    apk update \
+	&& apk upgrade \
+	&& apk add ca-certificates \
+	&& update-ca-certificates \
+            && apk add --update openjdk8-jre tzdata curl unzip bash \
+            && cp /usr/share/zoneinfo/${TIMEZONE} /etc/localtime \
+            && echo ${TIMEZONE} >  /etc/timezone \
+	&& rm -rf /var/cache/apk/* \
+	&& mkdir -p /tmp/dependencies  \
+	&& curl -L ${JMETER_DOWNLOAD_URL} >  /tmp/dependencies/apache-jmeter-${JMETER_VERSION}.tgz  \
+	&& mkdir -p /opt  \
+	&& tar -xzf /tmp/dependencies/apache-jmeter-${JMETER_VERSION}.tgz -C /opt  \
+	&& rm -rf /tmp/dependencies \
+	&& curl -L ${JMETER_PLUGINS_DOWNLOAD_URL}/cmdrunner/2.2/cmdrunner-2.2.jar -o ${JMETER_HOME}/lib/cmdrunner-2.2.jar \
+	&& curl -L ${JMETER_PLUGINS_DOWNLOAD_URL}/jmeter-plugins-manager/1.8/jmeter-plugins-manager-1.8.jar -o ${JMETER_PLUGINS_FOLDER}/jmeter-plugins-manager-1.8.jar
+
+ENV PATH $PATH:$JMETER_BIN
 
 COPY entrypoint.sh /entrypoint.sh
 COPY jmeter-plugin-install.sh /jmeter-plugin-install.sh
@@ -29,4 +42,4 @@ RUN chmod +x /entrypoint.sh \
     && /cleanup.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["-n -t /jmeter/First.jmx -l /jmeter/results/reslut-$(date +'%m_%d_%Y-%H_%M_%S_%N').jtl -j /jmeter/logs/master-log-$(date +'%m_%d_%Y-%H_%M_%S_%N').log"]
+CMD ["-n -t First.jmx -l /results/reslut-$(date +'%m_%d_%Y-%H_%M_%S_%N').jtl -j /logs/master-log-$(date +'%m_%d_%Y-%H_%M_%S_%N').log"]
