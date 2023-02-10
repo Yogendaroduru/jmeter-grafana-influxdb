@@ -24,7 +24,7 @@ pipeline {
         }
         stage('Build Kubernetese Config') {
             steps {    
-                sh 'mkdir -p `pwd`/kubernetes-init/data ;cp `pwd`/data/First.jmx `pwd`/kubernetes-init/data/First.jmx;'
+                sh 'mkdir -p `pwd`/kubernetes-init/data ;cp `pwd`/data `pwd`/kubernetes-init/;'
                 sh 'mkdir -p `pwd`/kubernetes-init/data/logs/;mkdir -p `pwd`/kubernetes-init/data/results/;'
                 echo 'kubernetes configuration for Jmeter Masters and Slaves created successfully'
                 //echo "current build number: ${currentBuild.number}"
