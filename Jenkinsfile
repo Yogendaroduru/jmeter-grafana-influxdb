@@ -18,6 +18,7 @@ pipeline {
         stage('Get latest Build from repository') {
             steps {
                 echo 'Pulling latest script from GIT'    
+		sh 'rm -rf jmeter-grafana-influxdb'    
                 sh 'git clone https://github.com/Yogendaroduru/jmeter-grafana-influxdb.git'
             }
         }
