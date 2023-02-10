@@ -9,7 +9,7 @@ spec:
   containers:
   - name: master
     image: saikrishnaoduru/jmeter:latest
-    args: ["-n -t /jmeter/First.jmx -l /jmeter/results/result.jtl -j /jmeter/logs/master-log.log  -e -o /jmeter/HtmlReport -R slave1; while true; do sleep 80; done;"]
+    args: ["-n -t /First.jmx -l /jmeter/results/result.jtl -j /logs/master-log.log  -e -o /HtmlReport -R slave1; while true; do sleep 80; done;"]
     env:
     - name: JVM_ARGS
       value: "-Xms512m -Xmx1024m"
