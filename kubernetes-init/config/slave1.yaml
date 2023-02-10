@@ -4,6 +4,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: slave1
+  namespace: dev
 spec:   
   selector:
     matchLabels:
@@ -18,7 +19,7 @@ spec:
       containers:
       - name: slave1
         image: saikrishnaoduru/jmeter:latest
-        args: ["-n -t /mnt/jmeter/script.jmx -l /mnt/jmeter/results/result-2023-02-08_17-41-36.jtl -j /mnt/jmeter/logs/slave1-log-2023-02-08_17-41-36.log -R SERVERS"]
+        args: ["-n -t /jmeter/First.jmx -l /jmeter/results/result-2023-02-08_17-41-36.jtl -j /jmeter/logs/slave1-log-2023-02-08_17-41-36.log -R SERVERS"]
         env:
         - name: JVM_ARGS
           value: "-Xms512m -Xmx1024m"
@@ -31,14 +32,7 @@ spec:
           requests:
             cpu: 1000m
             memory: 1024Mi
-        volumeMounts:
-          - name: slave1
-            mountPath: /mnt/jmeter
-      volumes:
-      - name: slave1
-        hostPath:
-          path: /home/saikrishna/Downloads/jmeter/kubernetes-init/data/
-          type: DirectoryOrCreate 
+       
 ---
 
 apiVersion: v1
