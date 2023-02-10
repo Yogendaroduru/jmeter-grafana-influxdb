@@ -17,8 +17,8 @@ pipeline {
 		}
         stage('Get latest Build from repository') {
             steps {
-                echo 'Pulling latest script from GIT'
-                git 'https://github.com/Yogendaroduru/jmeter-grafana-influxdb.git'
+                echo 'Pulling latest script from GIT'    
+                sh 'git clone https://github.com/Yogendaroduru/jmeter-grafana-influxdb.git'
             }
         }
         stage('Build Kubernetese Config') {
